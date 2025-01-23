@@ -58,7 +58,7 @@ class _OrderdetailsscreenState extends State<Orderdetailsscreen> {
             }
 
             // Navigate and pass 'order' if text is 'Order'
-            if (text == 'Order' && routeto != null && routeto.isNotEmpty) {
+            if (text == 'Buy' && routeto != null && routeto.isNotEmpty) {
               Navigator.pushNamed(context, routeto, arguments: order);
             }
             // Navigate if routeto is provided
@@ -797,7 +797,7 @@ class _OrderdetailsscreenState extends State<Orderdetailsscreen> {
               ),
               getoutlinebutton('Add To Cart', id: order.id),
               SizedBox(width: 20), // Space between the buttons
-              getoutlinebutton('Order', routeto: 'checkout', order: order),
+              getoutlinebutton('Buy', routeto: 'address', order: order),
               SizedBox(
                 width: 20,
               ),

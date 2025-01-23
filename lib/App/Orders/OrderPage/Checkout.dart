@@ -21,6 +21,38 @@ class _CheckoutState extends State<Checkout> {
 
   String? discountAmount;
 
+//edit open or not
+  bool openedit = false;
+
+  void _toggleEdit(index) {
+    setState(() {
+      cartItemDetails[index].toggle = !cartItemDetails[index]
+          .toggle; // Toggle the value between true and false
+    });
+  }
+
+  Future<void> deleteCartItem(String id) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    cartItemDetails.forEach((item) {
+      if (item.id == id) {
+        setState(() {
+          item.itemCount = 1;
+        });
+      }
+    });
+
+    setState(() {
+      cartItems.remove(id);
+      cartItemDetails.removeWhere((item) => item.id == id);
+    });
+
+    await prefs.setStringList('cartkey', cartItems);
+
+    print('Deleted item with ID: $id');
+    print('Updated cart items: $cartItems');
+  }
+
   Future<void> setdiscount() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? discount = prefs.getString('offer');
@@ -57,13 +89,6 @@ class _CheckoutState extends State<Checkout> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    loadaddress();
-    setdiscount();
-  }
-
   // void _navigateToSpeacialOffers() async {
   //   final selectedDiscount =
   //       await Navigator.pushNamed(context, 'specialoffers');
@@ -75,10 +100,57 @@ class _CheckoutState extends State<Checkout> {
   //   }
   // }
 
+  //item count
+
+  int count = 1;
+
+  List<String> cartItems = [];
+  List<discount> cartItemDetails = [];
+
+  Future<void> showcartitem() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    cartItems = prefs.getStringList('cartkey') ?? [];
+
+    cartItemDetails = cartItems.map((id) {
+      return discounts.firstWhere((item) => item.id == id);
+    }).toList();
+    setState(() {});
+
+    print(cartItemDetails[0]);
+  }
+
+  void increment(int index) {
+    setState(() {
+      cartItemDetails[index].itemCount++;
+    });
+    print(
+        'New count for ${cartItemDetails[index].name}: ${cartItemDetails[index].itemCount}');
+  }
+
+  void decrementCount(int index) {
+    setState(() {
+      if (cartItemDetails[index].itemCount > 0) {
+        cartItemDetails[index].itemCount--;
+      }
+    });
+    print(
+        'New count for ${cartItemDetails[index].name}: ${cartItemDetails[index].itemCount}');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadaddress();
+    setdiscount();
+    showcartitem();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final discount order =
-        ModalRoute.of(context)!.settings.arguments as discount;
+    //final discount order =
+    //  ModalRoute.of(context)!.settings.arguments as discount;
+    //  storeorder(order);
     // discounts.where((discount) => discount.category == 'Burger').toList();
     return Scaffold(
       appBar: AppBar(
@@ -259,8 +331,8 @@ class _CheckoutState extends State<Checkout> {
                 width: 328,
                 //   height: 200,
                 child: Container(
-                  constraints:
-                      BoxConstraints(maxHeight: /*order.length*/ 130 + 100),
+                  constraints: BoxConstraints(
+                      maxHeight: (cartItemDetails.length * 130) + 130),
                   child: Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),
@@ -314,100 +386,201 @@ class _CheckoutState extends State<Checkout> {
                                 NeverScrollableScrollPhysics(), // Optional if content is fixed
                             child: Column(
                               children: [
-                                Stack(
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.only(
-                                          left: 15, top: 15, bottom: 15),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                ListView.builder(
+                                    itemCount: cartItemDetails.length,
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      return Stack(
                                         children: [
-                                          // Image container
                                           Container(
-                                            height: 100,
-                                            width: 100,
-                                            decoration: BoxDecoration(
-                                              color: Color.fromARGB(
-                                                  255, 230, 225, 225),
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                            ),
-                                            child: Image.asset(
-                                              order
-                                                  .image, // Replace with the correct image property
-                                              height: 130,
-                                              width: 130,
-                                              fit: BoxFit.cover,
+                                            padding: EdgeInsets.only(
+                                                left: 15, top: 15, bottom: 15),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                // Image container
+                                                Container(
+                                                  height: 100,
+                                                  width: 100,
+                                                  decoration: BoxDecoration(
+                                                    color: Color.fromARGB(
+                                                        255, 230, 225, 225),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15),
+                                                  ),
+                                                  child: Image.asset(
+                                                    cartItemDetails[index]
+                                                        .image, // Replace with the correct image property
+                                                    height: 130,
+                                                    width: 130,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 15),
+                                                // Order details
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    SizedBox(height: 18),
+                                                    Text(
+                                                      cartItemDetails[index]
+                                                          .name, // Replace with the correct name property
+                                                      style: TextStyle(
+                                                          fontSize: 18),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                    SizedBox(height: 5),
+                                                    Text(
+                                                      'Rs.${int.parse(cartItemDetails[index].rs) * cartItemDetails[index].itemCount}', // Replace with the correct price property
+                                                      style: TextStyle(
+                                                          color: Colors.green,
+                                                          fontSize: 18),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    if (cartItemDetails[index]
+                                                            .toggle ==
+                                                        true)
+                                                      Row(
+                                                        children: [
+                                                          OutlinedButton(
+                                                            style: ButtonStyle(
+                                                                backgroundColor:
+                                                                    WidgetStateProperty
+                                                                        .all(Colors
+                                                                            .green),
+                                                                minimumSize:
+                                                                    WidgetStateProperty
+                                                                        .all(
+                                                                  Size(25, 25),
+                                                                ),
+                                                                shape:
+                                                                    WidgetStateProperty
+                                                                        .all(
+                                                                  RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            50),
+                                                                  ),
+                                                                ),
+                                                                side: WidgetStatePropertyAll(
+                                                                    BorderSide
+                                                                        .none)),
+                                                            onPressed: () {
+                                                              decrementCount(
+                                                                  index);
+
+                                                              if (cartItemDetails[
+                                                                          index]
+                                                                      .itemCount ==
+                                                                  0) {
+                                                                deleteCartItem(
+                                                                    cartItemDetails[
+                                                                            index]
+                                                                        .id);
+                                                              }
+                                                            },
+                                                            child: Icon(
+                                                              Icons
+                                                                  .exposure_minus_1,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          OutlinedButton(
+                                                            style: ButtonStyle(
+                                                                backgroundColor:
+                                                                    WidgetStateProperty
+                                                                        .all(Colors
+                                                                            .green),
+                                                                minimumSize:
+                                                                    WidgetStateProperty
+                                                                        .all(
+                                                                  Size(25, 25),
+                                                                ),
+                                                                shape:
+                                                                    WidgetStateProperty
+                                                                        .all(
+                                                                  RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            50),
+                                                                  ),
+                                                                ),
+                                                                side: WidgetStatePropertyAll(
+                                                                    BorderSide
+                                                                        .none)),
+                                                            onPressed: () {
+                                                              increment(index);
+                                                            },
+                                                            child: Icon(
+                                                              Icons.plus_one,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      )
+                                                  ],
+                                                ),
+                                                SizedBox(width: 20),
+                                              ],
                                             ),
                                           ),
-                                          SizedBox(width: 15),
-                                          // Order details
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              SizedBox(height: 18),
-                                              Text(
-                                                order
-                                                    .name, // Replace with the correct name property
-                                                style: TextStyle(fontSize: 18),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text(
-                                                'Rs.${order.rs}', // Replace with the correct price property
-                                                style: TextStyle(
-                                                    color: Colors.green,
-                                                    fontSize: 18),
-                                              ),
-                                            ],
+                                          // Positioned edit button
+                                          Positioned(
+                                            right: 15,
+                                            top: 18,
+                                            child: Column(
+                                              children: [
+                                                SizedBox(height: 10),
+                                                // Quantity display
+                                                Container(
+                                                  height: 30,
+                                                  width: 30,
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.green,
+                                                        width: 1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            7),
+                                                  ),
+                                                  alignment: Alignment.center,
+                                                  child: Text(
+                                                    '${cartItemDetails[index].itemCount}x',
+                                                    style: TextStyle(
+                                                        color: Colors.green),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 10),
+                                                // Edit button
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    print('Edit button tapped');
+
+                                                    _toggleEdit(index);
+                                                  },
+                                                  child: Icon(Icons.edit,
+                                                      color: Colors.green),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                          SizedBox(width: 20),
                                         ],
-                                      ),
-                                    ),
-                                    // Positioned edit button
-                                    Positioned(
-                                      right: 15,
-                                      top: 18,
-                                      child: Column(
-                                        children: [
-                                          SizedBox(height: 10),
-                                          // Quantity display
-                                          Container(
-                                            height: 30,
-                                            width: 30,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: Colors.green,
-                                                  width: 1),
-                                              borderRadius:
-                                                  BorderRadius.circular(7),
-                                            ),
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              '1x',
-                                              style: TextStyle(
-                                                  color: Colors.green),
-                                            ),
-                                          ),
-                                          SizedBox(height: 10),
-                                          // Edit button
-                                          GestureDetector(
-                                            onTap: () {
-                                              print('Edit button tapped');
-                                            },
-                                            child: Icon(Icons.edit,
-                                                color: Colors.green),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                      );
+                                    })
                               ],
                             ),
                           ),
@@ -618,16 +791,19 @@ class _CheckoutState extends State<Checkout> {
                   elevation: 0,
                   child: Column(
                     children: [
-                      getRow("Subtotal", "Rs.${order.rs}"),
+                      //  getRow("Subtotal", "Rs.${int.parse(order.rs) * count}"),
+                      getRow("Subtotal",
+                          "Rs.${cartItemDetails.fold(0, (sum, item) => sum + (int.parse(item.rs) * item.itemCount))}"),
+
                       getRow("Delivery Fee", "Rs.22"),
                       getRow("Promo",
-                          "Rs.${(double.parse(order.rs) * (double.tryParse(discountAmount?.replaceAll('%', '') ?? "0") ?? 0) / 100).toStringAsFixed(2)}"),
+                          "-Rs.${((cartItemDetails.fold(0, (sum, item) => sum + (int.parse(item.rs) * item.itemCount))) * (double.tryParse(discountAmount?.replaceAll('%', '') ?? "0") ?? 0) / 100).toStringAsFixed(2)}"),
                       SizedBox(
                         height: 20,
                       ),
                       BaseContainer(),
                       getRow("Total",
-                          "Rs:${calculatediscount(double.parse(order.rs), double.tryParse(discountAmount?.replaceAll('%', '') ?? "0") ?? 0)}"),
+                          "Rs:${calculatediscount((cartItemDetails.fold(0, (sum, item) => sum + (int.parse(item.rs) * item.itemCount))), double.tryParse(discountAmount?.replaceAll('%', '') ?? "0") ?? 0) + 22}"),
                     ],
                   ),
                 ),
@@ -657,15 +833,13 @@ class _CheckoutState extends State<Checkout> {
                   side: WidgetStatePropertyAll(BorderSide.none),
                 ),
                 onPressed: () {
-
-
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text('Order Placed'),
                     duration: Duration(seconds: 2),
                   ));
                 },
                 child: Text(
-                  'Place Order -  Rs:${calculatediscount(double.parse(order.rs), double.tryParse(discountAmount?.replaceAll('%', '') ?? "0") ?? 0)} ',
+                  'Place Order -  Rs:${calculatediscount((cartItemDetails.fold(0, (sum, item) => sum + (int.parse(item.rs) * item.itemCount))), double.tryParse(discountAmount?.replaceAll('%', '') ?? "0") ?? 0) + 22} ',
                   style: TextStyle(color: Colors.white),
                 ),
               ),

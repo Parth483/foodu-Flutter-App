@@ -27,6 +27,8 @@ class _SignupState extends State<Signup> {
   final TextEditingController _confirmpasswordcontroller =
       TextEditingController();
   final TextEditingController _datecontroller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
 
   String? groupvalue;
@@ -141,6 +143,7 @@ class _SignupState extends State<Signup> {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         body: SingleChildScrollView(
+          controller: _scrollController,
           child: Center(
             child: Column(
               children: [
@@ -623,6 +626,31 @@ class _SignupState extends State<Signup> {
                                         Navigator.pushReplacementNamed(
                                             context, 'login');
                                       });
+                                    }
+                                  } else {
+                                    final contextList = [
+                                      _namecontroller,
+                                      _emailcontroller,
+                                      _numbercontroller,
+                                      _addresscontroller,
+                                      _datecontroller,
+                                      _passwordcontroller,
+                                      _confirmpasswordcontroller,
+                                    ];
+
+                                    // Loop through the controllers and find the first invalid one
+                                    for (var controller in contextList) {
+                                      if (controller.text.isEmpty) {
+                                        _scrollController.animateTo(
+                                 
+                                 
+                                 
+                                          200.0, // Adjust this based on your form layout
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.easeInOut,
+                                        );
+                                        break;
+                                      }
                                     }
                                   }
                                 },

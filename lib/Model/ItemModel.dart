@@ -59,6 +59,8 @@ class discount {
   final String km;
   final String rs;
   final String category;
+  int itemCount;
+  bool toggle;
 
   discount(
       {required this.id,
@@ -68,7 +70,9 @@ class discount {
       required this.rating,
       required this.km,
       required this.rs,
-      required this.category});
+      required this.category,
+      required this.itemCount,
+      required this.toggle});
 }
 
 final List<discount> discounts = [
@@ -80,7 +84,9 @@ final List<discount> discounts = [
       rating: '4.8',
       km: '2',
       rs: '150',
-      category: 'Burger'),
+      category: 'Burger',
+      itemCount: 1,
+      toggle: false),
   discount(
       id: '2',
       name: 'Dessert',
@@ -89,7 +95,9 @@ final List<discount> discounts = [
       rating: '4.1',
       km: '8',
       rs: '370',
-      category: 'Dessert'),
+      category: 'Dessert',
+      itemCount: 1,
+      toggle: false),
   discount(
       id: '3',
       name: 'Noodles',
@@ -98,7 +106,9 @@ final List<discount> discounts = [
       rating: '4.2',
       km: '13',
       rs: '410',
-      category: 'Noodles'),
+      category: 'Noodles',
+      itemCount: 1,
+      toggle: false),
   discount(
       id: '4',
       name: 'Drink',
@@ -107,7 +117,9 @@ final List<discount> discounts = [
       rating: '3.8',
       km: '12',
       rs: '370',
-      category: 'Drink'),
+      category: 'Drink',
+      itemCount: 1,
+      toggle: false),
   discount(
       id: '5',
       name: 'Dosa',
@@ -116,7 +128,9 @@ final List<discount> discounts = [
       rating: '4.6',
       km: '9',
       rs: '770',
-      category: 'Dosa'),
+      category: 'Dosa',
+      itemCount: 1,
+      toggle: false),
   discount(
       id: '6',
       name: 'Meat',
@@ -125,7 +139,9 @@ final List<discount> discounts = [
       rating: '4.0',
       km: '1',
       rs: '870',
-      category: 'Meat'),
+      category: 'Meat',
+      itemCount: 1,
+      toggle: false),
   discount(
       id: '7',
       name: 'Pizza',
@@ -134,7 +150,9 @@ final List<discount> discounts = [
       rating: '4.5',
       km: '10',
       rs: '170',
-      category: 'Pizza'),
+      category: 'Pizza',
+      itemCount: 1,
+      toggle: false),
   discount(
       id: '8',
       name: 'Burger',
@@ -143,7 +161,9 @@ final List<discount> discounts = [
       rating: '4.8',
       km: '2',
       rs: '150',
-      category: 'Burger'),
+      category: 'Burger',
+      itemCount: 1,
+      toggle: false),
 ];
 
 class Addresss {

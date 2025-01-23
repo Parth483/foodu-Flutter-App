@@ -66,122 +66,164 @@ class _CartState extends State<Cart> {
       ),
       body: Center(
           child: cartItemDetails.isNotEmpty
-              ? ListView.builder(
-                  itemCount: cartItemDetails.length,
-                  itemBuilder: (context, index) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Slidable(
-                          endActionPane:
-                              ActionPane(motion: StretchMotion(), children: [
-                            SlidableAction(
-                              onPressed: (context) async {
-                                await deleteCartItem(cartItemDetails[index].id);
-                                print('Item Delete');
-                              },
-                              icon: Icons.delete,
-                              label: 'Delete',
-                              borderRadius: BorderRadius.circular(15),
-                              backgroundColor:
-                                  const Color.fromARGB(255, 245, 81, 69),
-                            )
-                          ]),
-                          child: Stack(
+              ? Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: cartItemDetails.length,
+                        itemBuilder: (context, index) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Card(
-                                elevation: 0,
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                margin: EdgeInsets.only(left: 15, right: 15),
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 10, right: 10, top: 10, bottom: 10),
-                                  child: Stack(
+                              Slidable(
+                                endActionPane: ActionPane(
+                                    motion: StretchMotion(),
                                     children: [
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Container(
-                                          //  color: Colors.blue,
-                                          padding: EdgeInsets.all(10),
-                                          width: 100,
-                                          height: 100,
-                                          decoration: BoxDecoration(
-                                              color: const Color.fromARGB(
-                                                  255, 230, 225, 225),
-                                              borderRadius:
-                                                  BorderRadius.circular(15)),
-                                          child: Image.asset(
-                                            cartItemDetails[index].image,
-                                            fit: BoxFit.cover,
-                                            width: 90,
-                                            height: 90,
-                                          ),
-                                        ),
+                                      SlidableAction(
+                                        onPressed: (context) async {
+                                          await deleteCartItem(
+                                              cartItemDetails[index].id);
+                                          print('Item Delete');
+                                        },
+                                        icon: Icons.delete,
+                                        label: 'Delete',
+                                        borderRadius: BorderRadius.circular(15),
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 245, 81, 69),
                                       )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                child: Column(
+                                    ]),
+                                child: Stack(
                                   children: [
-                                    Container(
-                                      margin: EdgeInsets.only(left: 135),
+                                    Card(
+                                      elevation: 0,
+                                      color: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      margin:
+                                          EdgeInsets.only(left: 15, right: 15),
+                                      child: Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 10,
+                                            right: 10,
+                                            top: 10,
+                                            bottom: 10),
+                                        child: Stack(
+                                          children: [
+                                            Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Container(
+                                                //  color: Colors.blue,
+                                                padding: EdgeInsets.all(10),
+                                                width: 100,
+                                                height: 100,
+                                                decoration: BoxDecoration(
+                                                    color: const Color.fromARGB(
+                                                        255, 230, 225, 225),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15)),
+                                                child: Image.asset(
+                                                  cartItemDetails[index].image,
+                                                  fit: BoxFit.cover,
+                                                  width: 90,
+                                                  height: 90,
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
                                       child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
                                         children: [
-                                          SizedBox(
-                                            height: 25,
+                                          Container(
+                                            margin: EdgeInsets.only(left: 135),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  height: 25,
+                                                ),
+                                                Text(
+                                                  cartItemDetails[index].name,
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.w900),
+                                                ),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Text(
+                                                  '${cartItemDetails[index].items}item | ${cartItemDetails[index].km}'
+                                                  'km',
+                                                  style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w900),
+                                                ),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Text(
+                                                  'Rs.${cartItemDetails[index].rs}',
+                                                  style: TextStyle(
+                                                      color:
+                                                          const Color.fromARGB(
+                                                              255, 99, 240, 71),
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w900),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                          Text(
-                                            cartItemDetails[index].name,
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w900),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(
-                                            '${cartItemDetails[index].items}item | ${cartItemDetails[index].km}'
-                                            'km',
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w900),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(
-                                            'Rs.${cartItemDetails[index].rs}',
-                                            style: TextStyle(
-                                                color: const Color.fromARGB(
-                                                    255, 99, 240, 71),
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w900),
-                                          )
                                         ],
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
+                              SizedBox(
+                                height: 20,
+                              ),
                             ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                      ],
-                    );
-                    // ignore: dead_code
-                  },
+                          );
+                          // ignore: dead_code
+                        },
+                      ),
+                    ),
+                    Container(
+                        padding: EdgeInsets.only(bottom: 30),
+                        child: OutlinedButton(
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    WidgetStateProperty.all(Colors.green),
+                                minimumSize: WidgetStateProperty.all(
+                                  Size(310, 50),
+                                ),
+                                shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(22),
+                                  ),
+                                ),
+                                side: WidgetStatePropertyAll(BorderSide.none)),
+                            onPressed: () {
+                              Navigator.pushNamed(context, 'checkout')
+                                  .then((result) {
+                                showcartitem();
+                              });
+                            },
+                            child: Text(
+                              'Checkout',
+                              style: TextStyle(color: Colors.white),
+                            )))
+                  ],
                 )
               : Column(
                   // mainAxisAlignment: MainAxisAlignment.center,
