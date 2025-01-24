@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:foodu/App/Homepage/subfolders/favourite.dart';
 import 'package:foodu/App/Homepage/subfolders/home.dart';
 import 'package:foodu/App/Homepage/subfolders/order.dart';
 import 'package:foodu/App/Homepage/subfolders/profile.dart';
@@ -69,6 +70,7 @@ class _HomepageState extends State<Homepage> {
         imagefile: _imagefile,
       ),
       const Order(),
+      Favourite(),
       Profile(changeToOrder: changeToOrder)
     ];
 
@@ -83,6 +85,7 @@ class _HomepageState extends State<Homepage> {
           children: widgetlist,
         ),
         bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
             onTap: (index) {
               setState(() {
                 myindex = index;
@@ -94,9 +97,14 @@ class _HomepageState extends State<Homepage> {
             },
             currentIndex: myindex,
             items: [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Home',
+              ),
               BottomNavigationBarItem(
                   icon: Icon(Icons.library_books_outlined), label: 'Order'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.heart_broken_rounded), label: 'Favourite'),
               BottomNavigationBarItem(
                   icon: Icon(Icons.person), label: 'Profile'),
             ]),

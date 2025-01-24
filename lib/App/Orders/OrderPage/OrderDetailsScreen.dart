@@ -33,7 +33,7 @@ class _OrderdetailsscreenState extends State<Orderdetailsscreen> {
     print('Updated cart IDs: ${prefs.getStringList('cartkey')}');
   }
 
-  Widget getoutlinebutton(text, {routeto, id, order}) {
+  Widget getoutlinebutton(text, index, {routeto, id, order}) {
     return Expanded(
       child: SizedBox(
         height: 50,
@@ -48,23 +48,27 @@ class _OrderdetailsscreenState extends State<Orderdetailsscreen> {
             side: WidgetStateProperty.all(BorderSide.none),
           ),
           onPressed: () async {
-            if (text == 'Add To Cart' && id != null) {
-              await storeuniqueid(id);
+            if (index == 0) {
+              if (id != null) {
+                await storeuniqueid(id);
 
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text('Added to Cart'),
-                duration: Duration(seconds: 2),
-              ));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Added to Cart'),
+                  duration: Duration(seconds: 2),
+                ));
+              }
+            } else {
+              Navigator.pushNamed(context, 'address',
+                  arguments: {'order': order});
             }
 
             // Navigate and pass 'order' if text is 'Order'
-            if (text == 'Buy' && routeto != null && routeto.isNotEmpty) {
-              Navigator.pushNamed(context, routeto, arguments: order);
-            }
-            // Navigate if routeto is provided
-            else if (routeto != null && routeto.isNotEmpty) {
-              Navigator.pushNamed(context, routeto);
-            }
+            // if (text == 'Buy' && routeto != null && routeto.isNotEmpty) {
+            // }
+            // // Navigate if routeto is provided
+            // else if (routeto != null && routeto.isNotEmpty) {
+            //   Navigator.pushNamed(context, routeto);
+            // }
           },
           child: Text(
             text,
@@ -795,9 +799,9 @@ class _OrderdetailsscreenState extends State<Orderdetailsscreen> {
               SizedBox(
                 width: 20,
               ),
-              getoutlinebutton('Add To Cart', id: order.id),
+              getoutlinebutton('Add To Cart', 0, id: order.id),
               SizedBox(width: 20), // Space between the buttons
-              getoutlinebutton('Buy', routeto: 'address', order: order),
+              getoutlinebutton('Buy', 1, routeto: 'address', order: order),
               SizedBox(
                 width: 20,
               ),

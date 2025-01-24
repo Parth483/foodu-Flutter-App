@@ -6,6 +6,7 @@ import 'package:foodu/App/Category/category.dart';
 import 'package:foodu/App/Category/food_category/item3.dart';
 import 'package:foodu/App/Category/specialoffers.dart';
 import 'package:foodu/App/Homepage/homepage.dart';
+import 'package:foodu/App/Homepage/subfolders/favourite.dart';
 import 'package:foodu/App/Homepage/subfolders/home.dart';
 import 'package:foodu/App/Homepage/subfolders/order.dart';
 import 'package:foodu/App/Homepage/subfolders/profile.dart';
@@ -79,7 +80,8 @@ class MyApp extends StatelessWidget {
           Overview.overview: (context) => Overview(),
           Otp.otp: (context) => Otp(),
           Addaddress.addaddress: (context) => Addaddress(),
-          Editaddress.editaddress: (context) => Editaddress()
+          Editaddress.editaddress: (context) => Editaddress(),
+          Favourite.favourite: (context) => Favourite()
         },
         // home: Signup(),
         debugShowCheckedModeBanner: false,
