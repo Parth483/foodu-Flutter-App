@@ -67,6 +67,9 @@ class _AddressState extends State<Address> {
     );
   }
 
+  //store address
+  String selectedAddress = '';
+
   @override
   void initState() {
     // TODO: implement initState
@@ -88,180 +91,257 @@ class _AddressState extends State<Address> {
           child: Column(
             children: [
               SizedBox(
-                height: 550,
+                height: 480,
                 child: ListView.builder(
                   itemCount: globalAddressList.length,
                   itemBuilder: (context, index) {
+                    String addressValue = jsonEncode({
+                      'type': globalAddressList[index].type,
+                      'address': globalAddressList[index].addresss,
+                      'state': globalAddressList[index].state,
+                      'city': globalAddressList[index].city,
+                    });
+
                     return Slidable(
-                      endActionPane: ActionPane(
-                        motion: StretchMotion(),
-                        children: [
-                          SlidableAction(
-                            onPressed: (context) async {
-                              await deleteAddress(index);
-                            },
-                            icon: Icons.delete,
-                            label: 'Delete',
-                            borderRadius: BorderRadius.circular(15),
-                            backgroundColor:
-                                const Color.fromARGB(255, 245, 81, 69),
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.zero,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 10),
-                            //color: Colors.amber,
-                            child: Card(
-                              elevation: 0.1,
-                              color: Colors.white,
-                              shadowColor: Colors.black,
-                              margin: EdgeInsets.zero,
-                              child: Row(
+                        endActionPane: ActionPane(
+                          motion: StretchMotion(),
+                          children: [
+                            SlidableAction(
+                              onPressed: (context) async {
+                                await deleteAddress(index);
+                              },
+                              icon: Icons.delete,
+                              label: 'Delete',
+                              borderRadius: BorderRadius.circular(15),
+                              backgroundColor:
+                                  const Color.fromARGB(255, 245, 81, 69),
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Stack(
                                 children: [
                                   Container(
-                                    height: 90,
-                                    width: 30,
-                                    decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                            26, 94, 93, 93),
-                                        shape: BoxShape.circle),
-                                    margin: EdgeInsets.only(left: 20),
-                                    alignment: Alignment.center,
-                                    child: Container(
-                                      height: 35,
-                                      width: 35,
-                                      decoration: BoxDecoration(
-                                          color: Colors.green,
-                                          shape: BoxShape.circle),
-                                      alignment: Alignment.center,
-                                      child: SvgPicture.asset(
-                                        'assets/svg/location.svg',
-                                        height: 20,
-                                        width: 20,
-                                        color: Colors.white,
+                                    margin: EdgeInsets.zero,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 15, vertical: 10),
+                                    //color: Colors.amber,
+                                    child: Card(
+                                      elevation: 0.1,
+                                      color: Colors.white,
+                                      shadowColor: Colors.black,
+                                      margin: EdgeInsets.zero,
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            height: 90,
+                                            width: 30,
+                                            decoration: BoxDecoration(
+                                                color: const Color.fromARGB(
+                                                    26, 94, 93, 93),
+                                                shape: BoxShape.circle),
+                                            margin: EdgeInsets.only(left: 20),
+                                            alignment: Alignment.center,
+                                            child: Container(
+                                              height: 35,
+                                              width: 35,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.green,
+                                                  shape: BoxShape.circle),
+                                              alignment: Alignment.center,
+                                              child: SvgPicture.asset(
+                                                'assets/svg/location.svg',
+                                                height: 20,
+                                                width: 20,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.only(
+                                                        left: 15),
+                                                    child: Text(
+                                                      globalAddressList[index]
+                                                          .type,
+                                                      style: TextStyle(
+                                                          fontSize: 20),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 15,
+                                                  ),
+                                                  if (index == 0)
+                                                    Container(
+                                                      padding: EdgeInsets.only(
+                                                          left: 8,
+                                                          right: 8,
+                                                          top: 5,
+                                                          bottom: 5),
+                                                      decoration: BoxDecoration(
+                                                          color: const Color
+                                                              .fromARGB(
+                                                              26, 93, 94, 93),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5)),
+                                                      child: Text(
+                                                        'Default',
+                                                        style: TextStyle(
+                                                            fontSize: 10,
+                                                            color:
+                                                                Colors.green),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(left: 15),
+                                                child: Text(
+                                                  globalAddressList[index]
+                                                      .addresss,
+                                                  style: TextStyle(
+                                                      fontSize: 15,
+                                                      color:
+                                                          const Color.fromARGB(
+                                                              255,
+                                                              160,
+                                                              160,
+                                                              160)),
+                                                ),
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.only(
+                                                        left: 15),
+                                                    child: Text(
+                                                      globalAddressList[index]
+                                                          .state,
+                                                      style: TextStyle(
+                                                          fontSize: 15,
+                                                          color: const Color
+                                                              .fromARGB(255,
+                                                              160, 160, 160)),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    padding: EdgeInsets.only(
+                                                        left: 15),
+                                                    child: Text(
+                                                      globalAddressList[index]
+                                                          .city,
+                                                      style: TextStyle(
+                                                        fontSize: 15,
+                                                        color: const Color
+                                                            .fromARGB(
+                                                            255, 160, 160, 160),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          )
+                                        ],
                                       ),
                                     ),
                                   ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.only(left: 15),
-                                            child: Text(
-                                              globalAddressList[index].type,
-                                              style: TextStyle(fontSize: 20),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 15,
-                                          ),
-                                          if (index == 0)
-                                            Container(
-                                              padding: EdgeInsets.only(
-                                                  left: 8,
-                                                  right: 8,
-                                                  top: 5,
-                                                  bottom: 5),
-                                              decoration: BoxDecoration(
-                                                  color: const Color.fromARGB(
-                                                      26, 93, 94, 93),
-                                                  borderRadius:
-                                                      BorderRadius.circular(5)),
-                                              child: Text(
-                                                'Default',
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.green),
-                                              ),
-                                            ),
-                                        ],
+                                  Positioned(
+                                    right: 20,
+                                    top: 32,
+                                    child: IconButton(
+                                      onPressed: () async {
+                                        final result =
+                                            await Navigator.pushNamed(
+                                                context, 'editaddress',
+                                                arguments: {
+                                              'address':
+                                                  globalAddressList[index],
+                                              'index': index,
+                                            });
+                                        if (result != null &&
+                                            result is Addresss) {
+                                          setState(() {
+                                            globalAddressList[index] = result;
+                                          });
+                                          await loadAddressList(
+                                              globalAddressList);
+                                          // SharedPreferences prefs =
+                                          //     await SharedPreferences.getInstance();
+                                          // List<String> addressJsonList = globalAddressList
+                                          //     .map((address) =>
+                                          //         json.encode(address.toJson()))
+                                          //     .toList();
+                                          // await prefs.setStringList(
+                                          //     'addressList', addressJsonList);
+                                        }
+                                      },
+                                      icon: Icon(
+                                        Icons.edit,
+                                        size: 20,
+                                        color: Colors.green,
                                       ),
-                                      Container(
-                                        padding: EdgeInsets.only(left: 15),
-                                        child: Text(
-                                          globalAddressList[index].addresss,
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: const Color.fromARGB(
-                                                  255, 160, 160, 160)),
-                                        ),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.only(left: 15),
-                                            child: Text(
-                                              globalAddressList[index].state,
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  color: const Color.fromARGB(
-                                                      255, 160, 160, 160)),
-                                            ),
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.only(left: 15),
-                                            child: Text(
-                                              globalAddressList[index].city,
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: const Color.fromARGB(
-                                                    255, 160, 160, 160),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  )
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-                          ),
-                          Positioned(
-                            right: 20,
-                            top: 32,
-                            child: IconButton(
-                              onPressed: () async {
-                                final result = await Navigator.pushNamed(
-                                    context, 'editaddress',
-                                    arguments: {
-                                      'address': globalAddressList[index],
-                                      'index': index,
+                            Container(
+                              padding: EdgeInsets.only(right: 20),
+                              child: Radio(
+                                  value: addressValue,
+                                  groupValue: selectedAddress,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedAddress = value!;
+                                      print('selectedAddress:$selectedAddress');
                                     });
-                                if (result != null && result is Addresss) {
-                                  setState(() {
-                                    globalAddressList[index] = result;
-                                  });
-                                  await loadAddressList(globalAddressList);
-                                  // SharedPreferences prefs =
-                                  //     await SharedPreferences.getInstance();
-                                  // List<String> addressJsonList = globalAddressList
-                                  //     .map((address) =>
-                                  //         json.encode(address.toJson()))
-                                  //     .toList();
-                                  // await prefs.setStringList(
-                                  //     'addressList', addressJsonList);
-                                }
-                              },
-                              icon: Icon(
-                                Icons.edit,
-                                size: 20,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+                                  }),
+                            )
+                          ],
+                        ));
                   },
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(left: 220, bottom: 20),
+                child: FloatingActionButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, 'addaddress')
+                        .then((result) async {
+                      if (result != null && result is List<Addresss>) {
+                        setState(() {
+                          globalAddressList.addAll(result);
+                        });
+                        loadAddressList(globalAddressList);
+                        // SharedPreferences prefs =
+                        //     await SharedPreferences.getInstance();
+                        // List<String> addressJsonList = globalAddressList
+                        //     .map((address) => json.encode(address.toJson()))
+                        //     .toList();
+
+                        // await prefs.setStringList('addressList', addressJsonList);
+                        // List<String>? dataList = prefs.getStringList('addressList');
+                        // print('AddressListsss:' + jsonEncode(dataList));
+                      }
+                    });
+                  },
+                  backgroundColor: Colors.green,
+                  elevation: 2,
+                  child: Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               Container(
@@ -285,28 +365,9 @@ class _AddressState extends State<Address> {
                   ),
                   side: WidgetStatePropertyAll(BorderSide.none),
                 ),
-                onPressed: () {
-                  Navigator.pushNamed(context, 'addaddress')
-                      .then((result) async {
-                    if (result != null && result is List<Addresss>) {
-                      setState(() {
-                        globalAddressList.addAll(result);
-                      });
-                      loadAddressList(globalAddressList);
-                      // SharedPreferences prefs =
-                      //     await SharedPreferences.getInstance();
-                      // List<String> addressJsonList = globalAddressList
-                      //     .map((address) => json.encode(address.toJson()))
-                      //     .toList();
-
-                      // await prefs.setStringList('addressList', addressJsonList);
-                      // List<String>? dataList = prefs.getStringList('addressList');
-                      // print('AddressListsss:' + jsonEncode(dataList));
-                    }
-                  });
-                },
+                onPressed: () {},
                 child: Text(
-                  'Add New Address',
+                  'Place Order',
                   style: TextStyle(color: Colors.white),
                 ),
               ),

@@ -209,7 +209,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               margin: EdgeInsets.only(top: 50),
               child: OutlinedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, 'cart');
+                  Navigator.pushNamed(context, 'checkout');
                 },
                 style: OutlinedButton.styleFrom(
                   shape: CircleBorder(),
