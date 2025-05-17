@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
+// import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:foodu/App/Category/food_category/foods/all.dart';
@@ -19,21 +21,36 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key, this.imagefile});
+  const Home({super.key});
   static const home = 'home';
-  final XFile? imagefile;
+  // final XFile? imagefile;
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+  bool isloading = false;
   String _dropdownvalue = 'Ahmedabad';
+  XFile? _imagefile;
+  String? imagepath;
+
   final _items = [
     'Ahmedabad',
     'Surat',
     'Baroda',
   ];
+
+  Future<void> getdata() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      imagepath = prefs.getString('image');
+      if (imagepath != null) {
+        _imagefile = XFile(imagepath!);
+      }
+    });
+  }
 
   final List<ItemModel> items = [
     ItemModel(name: "Burger", image: "assets/svg/food/burger.svg"),
@@ -73,12 +90,51 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   //   });
   // }
 
+  List<discount> retrivedDiscount = [];
+
+  Future<List<discount>> getfavouriteList() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? jsonList = prefs.getStringList('favouriteList');
+    if (jsonList == null) return [];
+
+    return jsonList.map((json) => discount.fromJson(jsonDecode(json))).toList();
+  }
+
+  Future<void> _SaveItems() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    List<String> jsonList = retrivedDiscount
+        .map((discount) => jsonEncode(discount.toJson()))
+        .toList();
+    prefs.setStringList('favouriteList', jsonList);
+  }
+
+  void toggleFavourite(int index) {
+    setState(() {
+      retrivedDiscount[index].isFavourite =
+          !retrivedDiscount[index].isFavourite;
+    });
+
+    _SaveItems();
+    // setState(() {});
+    // _loadData();
+  }
+
+  Future<void> _loadData() async {
+    List<discount> discounts = await getfavouriteList();
+    setState(() {
+      retrivedDiscount = discounts;
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    isloading = true;
     _tabController = TabController(length: 8, vsync: this);
-    // getdata();
+    _loadData();
+    getdata();
   }
   //String _selectedCity = 'Ahmedabad';
 
@@ -110,21 +166,21 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-                margin: EdgeInsets.only(top: 7.h, right: 2.w),
-                child: widget.imagefile != null &&
-                        widget.imagefile!.path.isNotEmpty
-                    ? ClipOval(
-                        child: Image.file(
-                          File(widget.imagefile!.path),
-                          width: 12.w,
-                          height: 12.w,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : Icon(
-                        Icons.account_circle,
-                        size: 10.w,
-                      )),
+              margin: EdgeInsets.only(top: 7.h, right: 2.w),
+              child: _imagefile != null && File(_imagefile!.path).existsSync()
+                  ? ClipOval(
+                      child: Image.file(
+                        File(_imagefile!.path),
+                        width: 12.w,
+                        height: 12.w,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Icon(
+                      Icons.account_circle,
+                      size: 10.w,
+                    ),
+            ),
             Column(
               // mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -420,111 +476,127 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 //padding: EdgeInsets.all(8),
                 //  color: Colors.amber,
                 height: 280,
-                child: ListView.builder(
-                  itemCount: discounts.length,
-                  scrollDirection: Axis.horizontal,
-                  physics: BouncingScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, 'orderdetails',
-                            arguments: discounts[index]);
-                      },
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        elevation: 0,
-                        shadowColor: Colors.grey.withOpacity(0.5),
-                        margin: EdgeInsets.only(left: 15),
-                        child: Padding(
-                          padding: EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Food Image Container
-                              Container(
-                                width: 150,
-                                height: 150,
-                                decoration: BoxDecoration(
-                                  color: Color.fromARGB(255, 230, 225, 225),
-                                  borderRadius: BorderRadius.circular(15),
+                child: isloading != true || retrivedDiscount.isEmpty
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : ListView.builder(
+                        itemCount: retrivedDiscount.length,
+                        scrollDirection: Axis.horizontal,
+                        physics: BouncingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, 'orderdetails',
+                                  arguments: retrivedDiscount[index]);
+                            },
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              elevation: 0,
+                              shadowColor: Colors.grey.withOpacity(0.5),
+                              margin: EdgeInsets.only(left: 15),
+                              child: Padding(
+                                padding: EdgeInsets.all(12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Food Image Container
+                                    Container(
+                                      width: 150,
+                                      height: 150,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Color.fromARGB(255, 230, 225, 225),
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Image.asset(
+                                        retrivedDiscount[index].image,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    // Food Title
+                                    Text(
+                                      retrivedDiscount[index].name,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    // Rating Row
+                                    Row(
+                                      children: [
+                                        Text(
+                                          '${retrivedDiscount[index].km}km   | ',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                        SvgPicture.asset(
+                                          'assets/svg/star.svg',
+                                          height: 20,
+                                          width: 20,
+                                        ),
+                                        Text(
+                                          '${retrivedDiscount[index].rating}  (1.2k)',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    // Price and Favorite Icon
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Rs. ${retrivedDiscount[index].rs}',
+                                          style: TextStyle(
+                                            color: Color.fromARGB(
+                                                255, 99, 240, 71),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 70,
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            toggleFavourite(index);
+
+                                            //_SaveItems();
+                                          },
+                                          child: retrivedDiscount[index]
+                                                      .isFavourite !=
+                                                  true
+                                              ? SvgPicture.asset(
+                                                  'assets/svg/heart.svg',
+                                                  height: 24,
+                                                  width: 24,
+                                                )
+                                              : SvgPicture.asset(
+                                                  'assets/svg/heart2.svg',
+                                                  height: 24,
+                                                  width: 24,
+                                                ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                child: Image.asset(
-                                  discounts[index].image,
-                                  fit: BoxFit.contain,
-                                ),
                               ),
-                              SizedBox(height: 10),
-                              // Food Title
-                              Text(
-                                discounts[index].name,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                              SizedBox(height: 5),
-                              // Rating Row
-                              Row(
-                                children: [
-                                  Text(
-                                    '${discounts[index].km}km   | ',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                  SvgPicture.asset(
-                                    'assets/svg/star.svg',
-                                    height: 20,
-                                    width: 20,
-                                  ),
-                                  Text(
-                                    '${discounts[index].rating}  (1.2k)',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 10),
-                              // Price and Favorite Icon
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Rs. ${discounts[index].rs}',
-                                    style: TextStyle(
-                                      color: Color.fromARGB(255, 99, 240, 71),
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 70,
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      print('heart');
-                                    },
-                                    child: SvgPicture.asset(
-                                      'assets/svg/heart.svg',
-                                      height: 24,
-                                      width: 24,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
               SizedBox(
                 height: 10,
@@ -584,7 +656,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             .toList()),
                     Expanded(
                       child: TabBarView(controller: _tabController, children: [
-                        All(),
+                        All(
+                            toggleFavourite: toggleFavourite,
+                            retrivedDiscount: retrivedDiscount),
                         Burgers(),
                         Desserts(),
                         Dosa(),

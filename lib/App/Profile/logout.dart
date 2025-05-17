@@ -16,7 +16,7 @@ class _LogoutState extends State<Logout> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
     await prefs.setBool('saveFirst', true);
-    //prefs.clear();
+    prefs.clear();
   }
 
   @override

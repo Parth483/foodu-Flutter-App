@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:foodu/Model/ItemModel.dart';
 //import 'package:foodu/App/Orders/OrderPage/orderdetailes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,12 +17,34 @@ class Splashscreen extends StatefulWidget {
 class _SplashscreenState extends State<Splashscreen> {
   bool? _isfirsttimeopen;
   bool? _isloggedin;
+  // bool? _otpEnter;
 
   Future<void> _checkopenstatus() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     _isfirsttimeopen = prefs.getBool('saveFirst') ?? true;
     _isloggedin = prefs.getBool('isLoggedIn') ?? false;
+    // _otpEnter = prefs.getBool('otp') ?? false;
+  }
+
+  Future<void> _saveitems() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    bool isExisting = prefs.containsKey('favouriteList');
+
+    // final List<String> jsonList =
+    //     discounts.map((discount) => jsonEncode(discount.toJson())).toList();
+
+    // await prefs.setStringList('favouriteList', jsonList);
+
+    if (!isExisting) {
+      final List<String> jsonList =
+          discounts.map((discount) => jsonEncode(discount.toJson())).toList();
+
+      await prefs.setStringList('favouriteList', jsonList);
+    } else {
+      print('list already exist');
+    }
   }
 
   @override
@@ -29,6 +54,7 @@ class _SplashscreenState extends State<Splashscreen> {
   }
 
   Future<void> _navigatoraftersplash() async {
+    await _saveitems();
     await _checkopenstatus();
     await Future.delayed(const Duration(seconds: 4));
 
@@ -39,9 +65,10 @@ class _SplashscreenState extends State<Splashscreen> {
         return;
       }
       if (_isloggedin == true) {
-        Navigator.pushNamedAndRemoveUntil(context, 'otp', (route) => false);
+        Navigator.pushNamedAndRemoveUntil(context, 'hompage', (route) => false);
         return;
       }
+
       Navigator.pushNamedAndRemoveUntil(context, 'welcome', (route) => false);
     }
   }

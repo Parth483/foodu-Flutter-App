@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:foodu/App/Homepage/subfolders/favourite.dart';
 import 'package:foodu/App/Homepage/subfolders/home.dart';
 import 'package:foodu/App/Homepage/subfolders/order.dart';
 import 'package:foodu/App/Homepage/subfolders/profile.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -16,36 +15,23 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  String? imagepath;
-  XFile? _imagefile;
-
-  Future<void> getdata() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    setState(() {
-      imagepath = prefs.getString('image');
-      if (imagepath != null) {
-        _imagefile = XFile(imagepath!);
-      }
-    });
-  }
-
-  Future<void> clearPreferences() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    print('SharedPreferences cleared!');
-  }
+  int myindex = 0;
+  bool hasDataLoaded = false;
+  var currentPage = 0;
+  var pageOptions = <Widget>[];
 
   @override
   void initState() {
+    setState(() {
+      pageOptions = [
+        Home(),
+        const Order(),
+        Favourite(),
+        Profile(changeToOrder: changeToOrder),
+      ];
+    });
     super.initState();
-    // clearPreferences();
-
-    getdata();
-    // widgetlist.add(Home());
   }
-
-  int myindex = 0;
 
   Future<void> changeToOrder() async {
     setState(() {
@@ -65,50 +51,88 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> widgetlist = [
-      Home(
-        imagefile: _imagefile,
-      ),
-      const Order(),
-      Favourite(),
-      Profile(changeToOrder: changeToOrder)
-    ];
-
     return WillPopScope(
       onWillPop: _onWillPop,
-      // canPop: myindex == 0,
-
       child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        body: IndexedStack(
-          index: myindex,
-          children: widgetlist,
+        body: Center(
+          child: pageOptions.elementAt(currentPage),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            onTap: (index) {
-              setState(() {
-                myindex = index;
-              });
-
-              if (index == 0) {
-                getdata();
-              }
-            },
-            currentIndex: myindex,
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.library_books_outlined), label: 'Order'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.heart_broken_rounded), label: 'Favourite'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.person), label: 'Profile'),
-            ]),
+        resizeToAvoidBottomInset: false,
+        extendBody: true,
+        bottomNavigationBar: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+          ),
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 10,
+                  color: Colors.black.withOpacity(.1),
+                )
+              ],
+            ),
+            child: GNav(
+              rippleColor: Colors.grey[300]!,
+              hoverColor: Colors.grey[100]!,
+              gap: 5,
+              curve: Curves.bounceInOut,
+              activeColor: Colors.white,
+              iconSize: 24,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              duration: const Duration(milliseconds: 400),
+              tabBorderRadius: 15,
+              tabBackgroundColor: Colors.green,
+              color: Colors.black,
+              tabs: [
+                GButton(
+                  icon: Icons.home_rounded,
+                  text: "",
+                  iconColor: Colors.green,
+                ),
+                GButton(
+                  icon: Icons.book_rounded,
+                  text: "",
+                  iconColor: Colors.green,
+                ),
+                GButton(
+                  icon: Icons.favorite,
+                  text: "",
+                  iconColor: Colors.green,
+                ),
+                GButton(
+                  icon: Icons.person_rounded,
+                  text: "",
+                  iconColor: Colors.green,
+                ),
+              ],
+              selectedIndex: currentPage,
+              onTabChange: (index) {
+                setState(() {
+                  changeIndex(index);
+                });
+              },
+            ),
+          ),
+        ),
       ),
     );
+  }
+
+  void changeIndex(int index) async {
+    if (index == 1) {
+      setState(() {
+        currentPage = index;
+      });
+    } else {
+      setState(() {
+        currentPage = index;
+      });
+    }
   }
 }

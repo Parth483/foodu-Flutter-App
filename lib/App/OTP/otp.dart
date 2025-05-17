@@ -55,10 +55,15 @@ class _OtpState extends State<Otp> {
     });
   }
 
+  // Future<void> saveotp() async {
+  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  //   await prefs.setBool('otp', true);
+  // }
+
   bool isloading = false;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     validPin = _generateRandomPin();
     _popcontroller = TextEditingController(text: validPin);
@@ -71,7 +76,6 @@ class _OtpState extends State<Otp> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     if (_timer.isActive) {
       _timer.cancel();
@@ -254,6 +258,8 @@ class _OtpState extends State<Otp> {
                               Future.delayed(Duration(seconds: 3), () {
                                 Navigator.pushReplacementNamed(
                                     context, 'hompage');
+
+                                ///     saveotp();
                               });
                             } else {
                               ScaffoldMessenger.of(context)

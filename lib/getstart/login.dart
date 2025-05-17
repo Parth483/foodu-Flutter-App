@@ -38,7 +38,7 @@ class _LoginState extends State<Login> {
         savedPassword == _passwordcontroller.text) {
       _loading();
       Future.delayed(Duration(seconds: 3), () {
-        Navigator.pushNamedAndRemoveUntil(context, 'otp', (route) => false);
+        Navigator.pushNamedAndRemoveUntil(context, 'hompage', (route) => false);
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

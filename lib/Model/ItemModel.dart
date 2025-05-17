@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
 class ItemModel {
   final String name;
@@ -61,6 +60,7 @@ class discount {
   final String category;
   int itemCount;
   bool toggle;
+  bool isFavourite;
 
   discount(
       {required this.id,
@@ -72,7 +72,40 @@ class discount {
       required this.rs,
       required this.category,
       required this.itemCount,
-      required this.toggle});
+      required this.toggle,
+      required this.isFavourite});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'image': image,
+      'items': items,
+      'rating': rating,
+      'km': km,
+      'rs': rs,
+      'category': category,
+      'itemcount': itemCount,
+      'toggle': toggle,
+      'isFavourite': isFavourite,
+    };
+  }
+
+  factory discount.fromJson(Map<String, dynamic> json) {
+    return discount(
+      id: json['id'],
+      name: json['name'],
+      image: json['image'],
+      items: json['items'],
+      rating: json['rating'],
+      km: json['km'],
+      rs: json['rs'],
+      category: json['category'],
+      itemCount: json['itemcount'],
+      toggle: json['toggle'],
+      isFavourite: json['isFavourite'],
+    );
+  }
 }
 
 final List<discount> discounts = [
@@ -86,7 +119,8 @@ final List<discount> discounts = [
       rs: '150',
       category: 'Burger',
       itemCount: 1,
-      toggle: false),
+      toggle: false,
+      isFavourite: false),
   discount(
       id: '2',
       name: 'Dessert',
@@ -97,7 +131,8 @@ final List<discount> discounts = [
       rs: '370',
       category: 'Dessert',
       itemCount: 1,
-      toggle: false),
+      toggle: false,
+      isFavourite: false),
   discount(
       id: '3',
       name: 'Noodles',
@@ -108,7 +143,8 @@ final List<discount> discounts = [
       rs: '410',
       category: 'Noodles',
       itemCount: 1,
-      toggle: false),
+      toggle: false,
+      isFavourite: false),
   discount(
       id: '4',
       name: 'Drink',
@@ -119,7 +155,8 @@ final List<discount> discounts = [
       rs: '370',
       category: 'Drink',
       itemCount: 1,
-      toggle: false),
+      toggle: false,
+      isFavourite: false),
   discount(
       id: '5',
       name: 'Dosa',
@@ -130,7 +167,8 @@ final List<discount> discounts = [
       rs: '770',
       category: 'Dosa',
       itemCount: 1,
-      toggle: false),
+      toggle: false,
+      isFavourite: false),
   discount(
       id: '6',
       name: 'Meat',
@@ -141,7 +179,8 @@ final List<discount> discounts = [
       rs: '870',
       category: 'Meat',
       itemCount: 1,
-      toggle: false),
+      toggle: false,
+      isFavourite: false),
   discount(
       id: '7',
       name: 'Pizza',
@@ -152,7 +191,8 @@ final List<discount> discounts = [
       rs: '170',
       category: 'Pizza',
       itemCount: 1,
-      toggle: false),
+      toggle: false,
+      isFavourite: false),
   discount(
       id: '8',
       name: 'Burger',
@@ -163,7 +203,8 @@ final List<discount> discounts = [
       rs: '150',
       category: 'Burger',
       itemCount: 1,
-      toggle: false),
+      toggle: false,
+      isFavourite: false),
 ];
 
 class Addresss {

@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:foodu/App/Homepage/subfolders/order.dart';
 
 import 'package:foodu/Model/ItemModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -79,10 +82,46 @@ class _OrderdetailsscreenState extends State<Orderdetailsscreen> {
     );
   }
 
+  late discount order;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Retrieve the order from the arguments passed via ModalRoute
+    order = ModalRoute.of(context)!.settings.arguments as discount;
+  }
+
+  void toggleFavourite() {
+    setState(() {
+      order.isFavourite = !order.isFavourite;
+    });
+
+    // _SaveItems();
+    // setState(() {});
+    // _loadData();
+  }
+
+  // Future<void> _SaveItems(int index) async {
+  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  //   // Fetch the existing list
+  //   List<String>? jsonList = prefs.getStringList('favouriteList');
+  //   if (jsonList == null || index >= jsonList.length) return;
+
+  //   // Update the specific item in the list
+  //   Map<String, dynamic> item = jsonDecode(jsonList[index]);
+  //   item['isFavourite'] = retrivedDiscount[index].isFavourite;
+  //   jsonList[index] = jsonEncode(item);
+
+  //   // Save the updated list back to SharedPreferences
+  //   await prefs.setStringList('favouriteList', jsonList);
+  //   print('Updated SharedPreferences: $jsonList');
+  // }
+
   @override
   Widget build(BuildContext context) {
-    final discount order =
-        ModalRoute.of(context)!.settings.arguments as discount;
+    // final discount order =
+    //     ModalRoute.of(context)!.settings.arguments as discount;
 
     // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     //   statusBarColor: Colors.transparent,
@@ -118,23 +157,35 @@ class _OrderdetailsscreenState extends State<Orderdetailsscreen> {
                                   },
                                   icon: Icon(
                                     Icons.arrow_back,
-                                    color: Colors.white,
+                                    color: Colors.black,
                                   )),
                               SizedBox(
                                 width: 200,
                               ),
                               Row(
                                 children: [
-                                  SvgPicture.asset(
-                                    'assets/svg/heart.svg',
-                                    color: Colors.white,
+                                  GestureDetector(
+                                    onTap: () {
+                                      toggleFavourite();
+
+                                      print('object');
+                                    },
+                                    child: !order.isFavourite
+                                        ? SvgPicture.asset(
+                                            'assets/svg/heart.svg',
+                                            color: Colors.black,
+                                          )
+                                        : SvgPicture.asset(
+                                            'assets/svg/heart2.svg',
+                                            //color: Colors.black,
+                                          ),
                                   ),
                                   SizedBox(
                                     width: 20,
                                   ),
                                   SvgPicture.asset(
                                     'assets/svg/message.svg',
-                                    color: Colors.white,
+                                    color: Colors.black,
                                   )
                                 ],
                               ),

@@ -1,16 +1,102 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 //import 'package:foodu/App/Homepage/subfolders/home.dart';
 import 'package:foodu/Model/ItemModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class All extends StatefulWidget {
-  const All({super.key});
+  List<discount>? retrivedDiscount;
+  final Function(int)? toggleFavourite;
+
+  All({super.key, this.retrivedDiscount, this.toggleFavourite});
 
   @override
   State<All> createState() => _AllState();
 }
 
 class _AllState extends State<All> {
+  // late List<discount> retrivedDiscount;
+
+  Future<void> _loadData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? jsonList = prefs.getStringList('favouriteList');
+    if (jsonList == null) return;
+
+    List<discount> discounts =
+        jsonList.map((json) => discount.fromJson(jsonDecode(json))).toList();
+
+    setState(() {
+      widget.retrivedDiscount = discounts;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // widget.retrivedDiscount = widget.retrivedDiscount ?? [];
+    _loadData();
+  }
+
+  // Future<List<discount>> getfavouriteList() async {
+  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   List<String>? jsonList = prefs.getStringList('favouriteList');
+  //   if (jsonList == null) return [];
+
+  //   return jsonList.map((json) => discount.fromJson(jsonDecode(json))).toList();
+  // }
+
+  // Future<void> _loadData() async {
+  //   List<discount> discounts = await getfavouriteList();
+  //   setState(() {
+  //     retrivedDiscount = discounts;
+  //   });
+  // }
+
+  Future<void> _SaveItems(int index) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    List<String>? jsonList = prefs.getStringList('favouriteList');
+    if (jsonList == null || index >= jsonList.length) return;
+
+    Map<String, dynamic> item = jsonDecode(jsonList[index]);
+
+    item['isFavourite'] = widget.retrivedDiscount![index].isFavourite;
+    jsonList[index] = jsonEncode(item);
+
+    // List<String> jsonList = retrivedDiscount!
+    //     .map((discount) => jsonEncode(discount.toJson()))
+    //     .toList();
+
+    await prefs.setStringList('favouriteList', jsonList);
+  }
+
+  void toggleFavourite(int index) {
+    widget.toggleFavourite!(index);
+    // setState(() {
+    //   retrivedDiscount[index].isFavourite =
+    //       !retrivedDiscount[index].isFavourite;
+    // });
+
+    // _SaveItems(index).then((_) {
+    //   setState(() {});
+    // });
+    // _loadData();
+
+    // setState(() {
+    //   // Toggle the favourite state
+    //   widget.retrivedDiscount![index].isFavourite =
+    //       !widget.retrivedDiscount![index].isFavourite;
+    // });
+
+    // Save the updated state to SharedPreferences
+    _SaveItems(index).then((_) {
+      setState(() {}); // Rebuild the widget to apply the changes
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +109,7 @@ class _AllState extends State<All> {
           ),
           Expanded(
             child: ListView.builder(
-                itemCount: discounts.length,
+                itemCount: widget.retrivedDiscount!.length,
                 itemBuilder: (context, index) {
                   return Column(
                     children: [
@@ -50,7 +136,7 @@ class _AllState extends State<All> {
                                         255, 230, 225, 225),
                                     borderRadius: BorderRadius.circular(22)),
                                 child: Image.asset(
-                                  discounts[index].image,
+                                  widget.retrivedDiscount![index].image,
                                   fit: BoxFit.cover,
                                   width: 90,
                                   height: 90,
@@ -64,7 +150,7 @@ class _AllState extends State<All> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      discounts[index].name,
+                                      widget.retrivedDiscount![index].name,
                                       style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w900),
@@ -77,7 +163,7 @@ class _AllState extends State<All> {
                                           MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${discounts[index].items} | ',
+                                          '${widget.retrivedDiscount![index].items} | ',
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w900),
@@ -88,7 +174,7 @@ class _AllState extends State<All> {
                                           width: 22,
                                         ),
                                         Text(
-                                          '${discounts[index].rating}  (${discounts[index].km}km',
+                                          '${widget.retrivedDiscount![index].rating}  (${widget.retrivedDiscount![index].km}km',
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w900),
@@ -103,7 +189,7 @@ class _AllState extends State<All> {
                                           MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Rs. ${discounts[index].rs}',
+                                          'Rs. ${widget.retrivedDiscount![index].rs}',
                                           style: TextStyle(
                                               color: const Color.fromARGB(
                                                   255, 99, 240, 71),
@@ -115,10 +201,17 @@ class _AllState extends State<All> {
                                             margin: EdgeInsets.only(left: 110),
                                             child: GestureDetector(
                                               onTap: () {
-                                                print('heart');
+                                                toggleFavourite(index);
                                               },
-                                              child: SvgPicture.asset(
-                                                  'assets/svg/heart.svg'),
+                                              child: widget
+                                                          .retrivedDiscount![
+                                                              index]
+                                                          .isFavourite !=
+                                                      true
+                                                  ? SvgPicture.asset(
+                                                      'assets/svg/heart.svg')
+                                                  : SvgPicture.asset(
+                                                      'assets/svg/heart2.svg'),
                                             ),
                                           ),
                                         )

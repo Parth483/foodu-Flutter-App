@@ -1,14 +1,79 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:foodu/Model/ItemModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Desserts extends StatelessWidget {
+class Desserts extends StatefulWidget {
   const Desserts({super.key});
 
   @override
+  State<Desserts> createState() => _DessertsState();
+}
+
+class _DessertsState extends State<Desserts> {
+  List<discount> retrivedDiscount = [];
+
+  Future<List<discount>> getfavouriteList() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? jsonList = prefs.getStringList('favouriteList');
+    if (jsonList == null) return [];
+
+    return jsonList.map((json) => discount.fromJson(jsonDecode(json))).toList();
+  }
+
+  Future<void> _loadData() async {
+    List<discount> discounts = await getfavouriteList();
+    setState(() {
+      retrivedDiscount =
+          discounts.where((item) => item.category == 'Dessert').toList();
+    });
+  }
+
+  Future<void> _SaveItems(int index) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Get the list of JSON-encoded strings from SharedPreferences
+    List<String>? jsonList = prefs.getStringList('favouriteList');
+    if (jsonList == null || index >= jsonList.length) return;
+
+    // Decode the specific item from JSON
+    Map<String, dynamic> item = jsonDecode(jsonList[index]);
+
+    // Toggle the 'isFavourite' field for that item
+    item['isFavourite'] = retrivedDiscount[index].isFavourite;
+
+    // Re-encode the item and save it back in the list
+    jsonList[index] = jsonEncode(item);
+
+    // Save the updated list back to SharedPreferences
+    await prefs.setStringList('favouriteList', jsonList);
+  }
+
+  void toggleFavourite(int index) {
+    setState(() {
+      // Toggle the 'isFavourite' value for the specific index
+      retrivedDiscount[index].isFavourite =
+          !retrivedDiscount[index].isFavourite;
+    });
+
+    // After toggling, save the item with the updated 'isFavourite' value
+    _SaveItems(index);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _loadData();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final List<discount> dessert =
-        discounts.where((discount) => discount.category == 'Dessert').toList();
+    // final List<discount> burger =
+    //     discounts.where((discount) => discount.category == 'Burger').toList();
 
     return Scaffold(
         body: Center(
@@ -20,7 +85,7 @@ class Desserts extends StatelessWidget {
           ),
           Expanded(
             child: ListView.builder(
-                itemCount: dessert.length,
+                itemCount: retrivedDiscount.length,
                 itemBuilder: (context, index) {
                   return Column(
                     children: [
@@ -47,7 +112,7 @@ class Desserts extends StatelessWidget {
                                         255, 230, 225, 225),
                                     borderRadius: BorderRadius.circular(22)),
                                 child: Image.asset(
-                                  dessert[index].image,
+                                  retrivedDiscount[index].image,
                                   fit: BoxFit.cover,
                                   width: 90,
                                   height: 90,
@@ -61,7 +126,7 @@ class Desserts extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      dessert[index].name,
+                                      retrivedDiscount[index].name,
                                       style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w900),
@@ -74,7 +139,7 @@ class Desserts extends StatelessWidget {
                                           MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${dessert[index].items} | ',
+                                          '${discounts[index].items} | ',
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w900),
@@ -85,7 +150,7 @@ class Desserts extends StatelessWidget {
                                           width: 22,
                                         ),
                                         Text(
-                                          '${dessert[index].rating}  (${dessert[index].km}km',
+                                          '${retrivedDiscount[index].rating}  (${retrivedDiscount[index].km}km',
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w900),
@@ -100,7 +165,7 @@ class Desserts extends StatelessWidget {
                                           MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Rs. ${dessert[index].rs}',
+                                          'Rs. ${retrivedDiscount[index].rs}',
                                           style: TextStyle(
                                               color: const Color.fromARGB(
                                                   255, 99, 240, 71),
@@ -112,10 +177,21 @@ class Desserts extends StatelessWidget {
                                             margin: EdgeInsets.only(left: 110),
                                             child: GestureDetector(
                                               onTap: () {
-                                                print('heart');
+                                                toggleFavourite(index);
                                               },
-                                              child: SvgPicture.asset(
-                                                  'assets/svg/heart.svg'),
+                                              child: retrivedDiscount[index]
+                                                          .isFavourite !=
+                                                      true
+                                                  ? SvgPicture.asset(
+                                                      'assets/svg/heart.svg',
+                                                      height: 24,
+                                                      width: 24,
+                                                    )
+                                                  : SvgPicture.asset(
+                                                      'assets/svg/heart2.svg',
+                                                      height: 24,
+                                                      width: 24,
+                                                    ),
                                             ),
                                           ),
                                         )

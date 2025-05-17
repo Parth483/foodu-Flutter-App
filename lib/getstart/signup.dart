@@ -233,17 +233,18 @@ class _SignupState extends State<Signup> {
                           child: TextFormField(
                             controller: _namecontroller,
                             decoration: InputDecoration(
-                                prefixIcon: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Icon(Icons.person),
-                                ),
-                                hintText: 'Full Name',
-                                filled: true,
-                                fillColor:
-                                    const Color.fromARGB(26, 185, 178, 178),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(13),
-                                    borderSide: BorderSide.none)),
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(Icons.person),
+                              ),
+                              hintText: 'Full Name',
+                              filled: true,
+                              fillColor:
+                                  const Color.fromARGB(26, 185, 178, 178),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(13),
+                                  borderSide: BorderSide.none),
+                            ),
                             // onChanged: (value) {
                             //   setState(() {
                             //      _form.currentState?.validate();
@@ -566,14 +567,15 @@ class _SignupState extends State<Signup> {
                         ),
                         if (isGenderSelected)
                           Container(
-                              padding: EdgeInsets.only(right: 190),
-                              child: Text(
-                                'Please Select The Gender',
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color:
-                                        const Color.fromARGB(255, 185, 39, 31)),
-                              )),
+                            padding: EdgeInsets.only(right: 190),
+                            child: Text(
+                              'Please Select The Gender',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color:
+                                      const Color.fromARGB(255, 185, 39, 31)),
+                            ),
+                          ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -624,7 +626,7 @@ class _SignupState extends State<Signup> {
                                       }
                                       Future.delayed(Duration(seconds: 3), () {
                                         Navigator.pushReplacementNamed(
-                                            context, 'login');
+                                            context, 'otp');
                                       });
                                     }
                                   } else {
@@ -642,9 +644,6 @@ class _SignupState extends State<Signup> {
                                     for (var controller in contextList) {
                                       if (controller.text.isEmpty) {
                                         _scrollController.animateTo(
-                                 
-                                 
-                                 
                                           200.0, // Adjust this based on your form layout
                                           duration: Duration(milliseconds: 300),
                                           curve: Curves.easeInOut,
@@ -725,7 +724,7 @@ class _SignupState extends State<Signup> {
                             SizedBox(
                               width: 15,
                             ),
-                            OutlinedButton(
+                              OutlinedButton(
                                 onPressed: () {},
                                 style: ButtonStyle(
                                   minimumSize:
@@ -739,8 +738,12 @@ class _SignupState extends State<Signup> {
                                           255, 219, 219, 219),
                                       width: 1)),
                                 ),
-                                child: SvgPicture.asset('assets/svg/google.svg',
-                                    height: 30, width: 30)),
+                                child: SvgPicture.asset(
+                                  'assets/svg/google.svg',
+                                  height: 30,
+                                  width: 30,
+                                ),
+                              ),
                             SizedBox(
                               width: 15,
                             ),

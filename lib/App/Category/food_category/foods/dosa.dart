@@ -1,14 +1,76 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:foodu/Model/ItemModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Dosa extends StatelessWidget {
+class Dosa extends StatefulWidget {
   const Dosa({super.key});
 
   @override
+  State<Dosa> createState() => _DosaState();
+}
+
+class _DosaState extends State<Dosa> {
+  List<discount> retrivedDiscount = [];
+
+  Future<List<discount>> getfavouriteList() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? jsonList = prefs.getStringList('favouriteList');
+    if (jsonList == null) return [];
+
+    return jsonList.map((json) => discount.fromJson(jsonDecode(json))).toList();
+  }
+
+  Future<void> _loadData() async {
+    List<discount> discounts = await getfavouriteList();
+    setState(() {
+      retrivedDiscount =
+          discounts.where((item) => item.category == 'Dosa').toList();
+    });
+  }
+
+  Future<void> _SaveItems(int index) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    List<String>? jsonList = prefs.getStringList('favouriteList');
+    if (jsonList == null || index >= jsonList.length) return;
+
+    Map<String, dynamic> item = jsonDecode(jsonList[index]);
+
+    item['isFavourite'] = retrivedDiscount[index].isFavourite;
+    jsonList[index] = jsonEncode(item);
+
+    // List<String> jsonList = retrivedDiscount!
+    //     .map((discount) => jsonEncode(discount.toJson()))
+    //     .toList();
+
+    await prefs.setStringList('favouriteList', jsonList);
+  }
+
+  void toggleFavourite(int index) {
+    setState(() {
+      retrivedDiscount[index].isFavourite =
+          !retrivedDiscount[index].isFavourite;
+    });
+
+    _SaveItems(index);
+    _loadData();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _loadData();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final List<discount> dosa =
-        discounts.where((discount) => discount.category == 'Dosa').toList();
+    // final List<discount> burger =
+    //     discounts.where((discount) => discount.category == 'Burger').toList();
 
     return Scaffold(
         body: Center(
@@ -20,7 +82,7 @@ class Dosa extends StatelessWidget {
           ),
           Expanded(
             child: ListView.builder(
-                itemCount: dosa.length,
+                itemCount: retrivedDiscount.length,
                 itemBuilder: (context, index) {
                   return Column(
                     children: [
@@ -47,7 +109,7 @@ class Dosa extends StatelessWidget {
                                         255, 230, 225, 225),
                                     borderRadius: BorderRadius.circular(22)),
                                 child: Image.asset(
-                                  dosa[index].image,
+                                  retrivedDiscount[index].image,
                                   fit: BoxFit.cover,
                                   width: 90,
                                   height: 90,
@@ -61,7 +123,7 @@ class Dosa extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      dosa[index].name,
+                                      retrivedDiscount[index].name,
                                       style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.w900),
@@ -74,7 +136,7 @@ class Dosa extends StatelessWidget {
                                           MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${dosa[index].items} | ',
+                                          '${discounts[index].items} | ',
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w900),
@@ -85,7 +147,7 @@ class Dosa extends StatelessWidget {
                                           width: 22,
                                         ),
                                         Text(
-                                          '${dosa[index].rating}  (${dosa[index].km}km',
+                                          '${retrivedDiscount[index].rating}  (${retrivedDiscount[index].km}km',
                                           style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w900),
@@ -100,7 +162,7 @@ class Dosa extends StatelessWidget {
                                           MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Rs. ${dosa[index].rs}',
+                                          'Rs. ${retrivedDiscount[index].rs}',
                                           style: TextStyle(
                                               color: const Color.fromARGB(
                                                   255, 99, 240, 71),
@@ -112,10 +174,21 @@ class Dosa extends StatelessWidget {
                                             margin: EdgeInsets.only(left: 110),
                                             child: GestureDetector(
                                               onTap: () {
-                                                print('heart');
+                                                toggleFavourite(index);
                                               },
-                                              child: SvgPicture.asset(
-                                                  'assets/svg/heart.svg'),
+                                              child: retrivedDiscount[index]
+                                                          .isFavourite !=
+                                                      true
+                                                  ? SvgPicture.asset(
+                                                      'assets/svg/heart.svg',
+                                                      height: 24,
+                                                      width: 24,
+                                                    )
+                                                  : SvgPicture.asset(
+                                                      'assets/svg/heart2.svg',
+                                                      height: 24,
+                                                      width: 24,
+                                                    ),
                                             ),
                                           ),
                                         )

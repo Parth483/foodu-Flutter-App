@@ -18,7 +18,6 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   String? name;
-
   String? email;
   String? contact;
   String? address;
